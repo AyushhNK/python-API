@@ -1,4 +1,4 @@
-from fastapi import FastAPI,Response,status,HTTPException
+from fastapi import FastAPI,Response,status,HTTPException,Depends
 from fastapi.params import Body
 from pydantic import BaseModel
 from random import randrange
@@ -7,10 +7,16 @@ from psycopg2.extras import RealDictCursor
 import time
 import os
 from dotenv import load_dotenv
+from sqlalchemy.orm import Session
+from . import models
+from .database import engine,get_db
 
 load_dotenv()
 
+models.Base.metadata.create_all(bind=engine)
+
 app=FastAPI()
+
 
 class Post(BaseModel):
 	title:str
@@ -90,3 +96,6 @@ def update_post(id:int,post:Post):
 		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"the post with id:{id} not found")
 	return {"data":updated_post}
 
+@app.get('/sqlalchmey')
+def getall(db: Session = Depends(get_db)):
+	return {"status":"sucess"}
