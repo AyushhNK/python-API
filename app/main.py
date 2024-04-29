@@ -4,14 +4,17 @@ from fastapi.params import Body
 from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
+
 import time
 import os
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
-from . import models,schemas
+from . import models,schemas,utils
 from .database import engine,get_db
 
 load_dotenv()
+
+
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -109,3 +112,15 @@ def update_post(id:int,post:schemas.CreatePost):
 	p.update(post.dict())
 	db.commit()
 	return updated_post
+
+
+@app.post('/users',status_code=status.HTTP_201_CREATED,response_model=schemas.UserOut)
+def create_user(user:schemas.UserCreate,db: Session = Depends(get_db)):
+
+	hashed_password=utils.hash(user.password)
+	user.password=hashed_password
+	new_user=models.User(**user.dict())
+	db.add(new_user)
+	db.commit()
+	db.refresh(new_user)
+	return new_user
