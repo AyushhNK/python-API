@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from ..database import engine,get_db
 from .. import models,schemas,utils
+from .. import oauth2
 
 router=APIRouter(
 	prefix="/posts",
@@ -11,7 +12,7 @@ router=APIRouter(
 
 
 @router.get('/',response_model=List[schemas.PostResponse])
-def get_all_posts(db: Session = Depends(get_db)):
+def get_all_posts(db: Session = Depends(get_db),id:int=Depends(oauth2.get_current_user)):
 	# cursor.execute("""SELECT * FROM posts""")
 	# posts=cursor.fetchall()
 	posts=db.query(models.Post).all()
