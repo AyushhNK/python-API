@@ -12,7 +12,7 @@ router=APIRouter(
 
 
 @router.get('/',response_model=List[schemas.PostResponse])
-def get_all_posts(db: Session = Depends(get_db),id:int=Depends(oauth2.get_current_user)):
+def get_all_posts(db: Session = Depends(get_db),user:int= Depends(oauth2.get_current_user)):
 	# cursor.execute("""SELECT * FROM posts""")
 	# posts=cursor.fetchall()
 	posts=db.query(models.Post).all()
@@ -38,7 +38,7 @@ def create_post(post:schemas.CreatePost,db: Session = Depends(get_db)):
 
 
 @router.get('/{id}',response_model=schemas.PostResponse)
-def get_post(id:int,response:Response,db: Session = Depends(get_db)):
+def get_post(id:int,response:Response,db: Session = Depends(get_db),user:int= Depends(oauth2.get_current_user)):
 	# cursor.execute("""SELECT * FROM posts WHERE id=%s""",(str(id)))
 	# post=cursor.fetchone()
 

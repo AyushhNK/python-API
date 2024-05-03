@@ -3,6 +3,7 @@ from datetime import datetime,timedelta
 from .schemas import TokenData
 from fastapi import status,HTTPException,Depends
 from fastapi.security import OAuth2PasswordBearer
+from . import schemas
 
 oauth2_scheme=OAuth2PasswordBearer(tokenUrl='login')
 
@@ -22,7 +23,7 @@ def create_access_token(data:dict):
 
 def verify_access_token(token:str,credentials_exception):
 	try:
-		payload=jwt.decode(token,SECRET_KEY,algorithm=ALGORITHM)
+		payload=jwt.decode(token,SECRET_KEY,algorithms=[ALGORITHM])
 		id:str=payload.get("user_id")
 		if id is None:
 			raise credentials_exception
