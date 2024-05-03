@@ -11,7 +11,9 @@ class CreatePost(PostBase):
 	pass
 
 class PostResponse(PostBase):
+	id:int
 	created_at:datetime
+	owner_id:int
 
 class UserCreate(BaseModel):
 	email:EmailStr
@@ -33,5 +35,5 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
 	model_config = ConfigDict(coerce_numbers_to_str=True)
-	
+
 	id:Optional[str]=None
