@@ -5,13 +5,12 @@ from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
-import os
 from dotenv import load_dotenv
 from .database import engine,get_db
 from . import models,schemas,utils
 from .routers import user,post,auth
+from .config import settings
 
-load_dotenv()
 
 
 
@@ -19,12 +18,9 @@ models.Base.metadata.create_all(bind=engine)
 
 app=FastAPI()
 
-
-PASSWORD=os.environ.get('POSTGRES_PASSWORD')
-
 while True:
 	try:
-		conn=psycopg2.connect(host="localhost",database="fastapi",user="postgres",password=PASSWORD,cursor_factory=RealDictCursor)
+		conn=psycopg2.connect(host="localhost",database="fastapi",user="postgres",password=settings.postgres_password,cursor_factory=RealDictCursor)
 		cursor=conn.cursor()
 		print("connection to the database sucessful")
 		break
@@ -45,7 +41,6 @@ def find_index(id):
 	for i,p in enumerate(my_post):
 		if p["id"]==id:
 			return i
-
 
 app.include_router(user.router)
 app.include_router(post.router)

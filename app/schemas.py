@@ -10,20 +10,22 @@ class PostBase(BaseModel):
 class CreatePost(PostBase):
 	pass
 
+class UserOut(BaseModel):
+	email:EmailStr
+	id:int
+	created_at:datetime
+
 class PostResponse(PostBase):
 	id:int
 	created_at:datetime
 	owner_id:int
+	owner:UserOut
 
 class UserCreate(BaseModel):
 	email:EmailStr
 	password:str
 	created_at:datetime
 
-class UserOut(BaseModel):
-	email:EmailStr
-	id:int
-	created_at:datetime
 
 class UserLogin(BaseModel):
 	email:EmailStr
