@@ -33,7 +33,7 @@ def create_post(post:schemas.CreatePost,db: Session = Depends(get_db),current_us
 	# new_post=cursor.fetchone()
 	# conn.commit()
 
-	new_post=models.Post(**post.dict())
+	new_post=models.Post(owner_id=current_user.id,**post.dict())
 	db.add(new_post)
 	db.commit()
 	db.refresh(new_post)
@@ -60,9 +60,10 @@ def delete_post(id:int,db: Session = Depends(get_db),current_user:int= Depends(o
 	post=db.query(models.Post).filter(models.Post.id==id)
 	if post.first()==None:
 		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"the post with id:{id} not found")
-	else:
-		post.delete()
-		db.commit()
+	if post.first().id != current_user.id:
+		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="not authorized to delete the post")
+	post.delete()
+	db.commit()
 	return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 @router.put('/{id}',response_model=schemas.PostResponse)
@@ -76,6 +77,8 @@ def update_post(id:int,post:schemas.CreatePost,current_user:int= Depends(oauth2.
 
 	if post==None:
 		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"the post with id:{id} not found")
+	if post.first().id != current_user.id:
+		raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="not authorized to update the post")
 	p.update(post.dict())
 	db.commit()
 	return updated_post
