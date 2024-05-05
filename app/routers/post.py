@@ -4,6 +4,7 @@ from typing import List,Optional
 from ..database import engine,get_db
 from .. import models,schemas,utils
 from .. import oauth2
+from sqlalchemy import func
 
 router=APIRouter(
 	prefix="/posts",
@@ -11,14 +12,19 @@ router=APIRouter(
 	)
 
 
-@router.get('/',response_model=List[schemas.PostResponse])
+@router.get('/',response_model=List[schemas.PostOut])
+# @router.get('/',)
 def get_all_posts(db: Session = Depends(get_db),current_user:int= Depends(oauth2.get_current_user),limit:int=5,skip:int=0,search:Optional[str]=""):
 	# cursor.execute("""SELECT * FROM posts""")
 	# posts=cursor.fetchall()
 
 	print(current_user.email)
 
-	posts=db.query(models.Post).filter(models.Post.title.contains(search)).offset(skip).limit(limit)
+	# posts=db.query(models.Post).filter(models.Post.title.contains(search)).offset(skip).limit(limit)
+	# results=db.query(models.Post,func.count(models.Vote.post_id).label("votes")).join(models.Vote,models.Vote.post_id==models.Post.id,isouter=True).group_by(models.Post.id).all()
+	# # print(results)
+	# return results
+	posts = db.query(models.Post, func.count(models.Vote.post_id).label("votes")).join(models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
 	return posts
 
 # @router.post('/createpost')

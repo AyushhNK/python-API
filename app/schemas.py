@@ -4,9 +4,7 @@ from typing import Optional
 from pydantic.types import conint
 
 class PostBase(BaseModel):
-	title:str
-	content:str
-	published:bool=False
+	pass
 
 class CreatePost(PostBase):
 	pass
@@ -16,11 +14,27 @@ class UserOut(BaseModel):
 	id:int
 	created_at:datetime
 
+	class Config:
+		orm_mode:True
+
 class PostResponse(PostBase):
 	id:int
 	created_at:datetime
 	owner_id:int
 	owner:UserOut
+	title:str
+	content:str
+	published:bool=False
+
+	class Config:
+		orm_mode:True
+
+class PostOut(PostBase):
+	Post:PostResponse
+	votes:int
+
+	class Config:
+		orm_mode:True
 
 class UserCreate(BaseModel):
 	email:EmailStr
