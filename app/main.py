@@ -10,15 +10,24 @@ from .database import engine,get_db
 from . import models,schemas,utils
 from .routers import user,post,auth,vote
 from .config import settings
-from starlette.middleware import Middleware
-from starlette.middleware.cors import CORSMiddleware 
+from fastapi.middleware.cors import CORSMiddleware 
 
 
 # models.Base.metadata.create_all(bind=engine)
 
 app=FastAPI()
 
+origins = [
+    "*",
+]
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 while True:
@@ -55,9 +64,4 @@ def hello():
 	return {"message":"hello world"}
 
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+
